@@ -254,7 +254,14 @@ public final class Version {
    * Use this to get the latest &amp; greatest settings, bug
    * fixes, etc, for Lucene.
    */
+  @Deprecated
   public static final Version LUCENE_7_7_3 = new Version(7, 7, 3);
+
+
+  /**
+   * Match settings and bugs in Lucene's 7.7.4 release.
+   */
+  public static final Version LUCENE_7_7_4 = new Version(7, 7, 4);
 
   // To add a new version:
   //  * Only add above this comment
@@ -275,7 +282,7 @@ public final class Version {
    * some defaults may have changed and may break functionality 
    * in your application.
    */
-  public static final Version LATEST = LUCENE_7_7_3;
+  public static final Version LATEST = LUCENE_7_7_4;
 
   /**
    * Constant for backwards compatibility.
