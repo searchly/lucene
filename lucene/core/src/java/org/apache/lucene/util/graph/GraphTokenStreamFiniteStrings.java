@@ -48,6 +48,10 @@ import static org.apache.lucene.util.automaton.Operations.DEFAULT_MAX_DETERMINIZ
  * This class also provides helpers to explore the different paths of the {@link Automaton}.
  */
 public final class GraphTokenStreamFiniteStrings {
+
+  /** Maximum level of recursion allowed in recursive operations. */
+  private static final int MAX_RECURSION_LEVEL = 1000;
+
   private final Map<Integer, BytesRef> idToTerm = new HashMap<>();
   private final Map<Integer, Integer> idToInc = new HashMap<>();
   private final Automaton det;
@@ -262,8 +266,15 @@ public final class GraphTokenStreamFiniteStrings {
     return id;
   }
 
-  private static void articulationPointsRecurse(Automaton a, int state, int d, int[] depth, int[] low, int[] parent,
-                                                BitSet visited, List<Integer> points) {
+  private static void articulationPointsRecurse(
+          Automaton a,
+          int state,
+          int d,
+          int[] depth,
+          int[] low,
+          int[] parent,
+          BitSet visited,
+          List<Integer> points) {
     visited.set(state);
     depth[state] = d;
     low[state] = d;
@@ -275,7 +286,12 @@ public final class GraphTokenStreamFiniteStrings {
       a.getNextTransition(t);
       if (visited.get(t.dest) == false) {
         parent[t.dest] = state;
-        articulationPointsRecurse(a, t.dest, d + 1, depth, low, parent, visited, points);
+        if (d < MAX_RECURSION_LEVEL) {
+          articulationPointsRecurse(a, t.dest, d + 1, depth, low, parent, visited, points);
+        } else {
+          throw new IllegalArgumentException(
+                  "Exceeded maximum recursion level during graph analysis");
+        }
         childCount++;
         if (low[t.dest] >= depth[state]) {
           isArticulation = true;
